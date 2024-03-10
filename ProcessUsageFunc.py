@@ -1,22 +1,26 @@
 import time 
+import datetime
 
-def update_text_current(processes,processNum):
-    counterP = 0
-    TEXT = '\nHighest CPU %:\n\n'
+def update_text_current(processes,processNum,text):
+    counter=0
     for p in processes:
-        if counterP>=processNum:
-            return TEXT
+        if counter==(processNum-1):
+            t = f"{p[0]} - CPU Usage: {p[1]}%"
+            text+=t
+            return text
         if p[0]!='':
-            text = f"{p[0]} - CPU Usage: {p[1]}%\n"
-            TEXT+=text
-            counterP+=1
+            t = f"{p[0]} - CPU Usage: {p[1]}%\n"
+            text+=t
+            counter+=1
 
-def update_text_high(cpuMax):
-    TEXT_HIGH = '\n\nHighest CPU % (last 22 min):\n\n'
-    for m in cpuMax:
-        t = f"{m[0]} - CPU Usage: {m[1]}%\n"
-        TEXT_HIGH+=t
-    return TEXT_HIGH
+def update_text_high(cpuMax,text,highNum):
+    for i in range(highNum):
+        if i == (highNum-1):
+            t = f"{str(cpuMax[i][0])} : {datetime.datetime.fromtimestamp(cpuMax[i][2]).strftime('%H:%M')}  -  CPU: {cpuMax[i][1]}%"
+        else:
+            t = f"{str(cpuMax[i][0])} : {datetime.datetime.fromtimestamp(cpuMax[i][2]).strftime('%H:%M')}  -  CPU: {cpuMax[i][1]}%\n"
+        text+=t
+    return text
 
 def delete_old_high_process(lenCpuMax,cpuMax,highMaxTime):
     now = time.time()    
