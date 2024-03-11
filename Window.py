@@ -1,5 +1,20 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk,font
+
+def defineFont(familyF,sizeF,weightF='normal'):
+    return font.Font(family=familyF, size=sizeF, weight=weightF)
+unitsIndex = {'KB':1024,'MB':1024**2,'GB':1024**3}
+
+processNum = int()      # rows
+highNum= int()          # rows
+unit = str()
+highMaxTime = 3960      # sec
+refreshRate = 1333      # ms
+
+red = '#FFE2E2'
+blue = '#E2F1FF'
+bgColor = '#ECF5F9'
+textColor = "#060606"
 
 def showOptions(root,MainScreen,unitsIndex,SecondScreen,labelFont,red,blue,textColor,unitsChoice=False):
     unit = MainScreen[3].get() if unitsChoice else '%'
