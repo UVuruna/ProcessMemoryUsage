@@ -6,6 +6,8 @@ from collections import defaultdict
 def UpdateProcess(processNum,headingMain,formatNum,highNum,cpuMax,highMaxTime,headingHigh,currProc_label,highProc_label,OBJ_TYPE,unit,unitValue):
     processesRaw = defaultdict(int)
     memoryUsage = 0
+
+    # Creating/Updating DATA
     if OBJ_TYPE == 'memory_info':
         for p in psutil.process_iter(['name', OBJ_TYPE]):
             mem = p.info[OBJ_TYPE].rss/unitValue
@@ -14,18 +16,17 @@ def UpdateProcess(processNum,headingMain,formatNum,highNum,cpuMax,highMaxTime,he
     elif OBJ_TYPE == 'cpu_percent':
         for p in psutil.process_iter(['name', OBJ_TYPE]):
             processesRaw[p.info['name']] += p.info[OBJ_TYPE]
-
     processes = sorted(processesRaw.items(), key=lambda x: x[1], reverse=True)
-
-    heading = headingMain(memoryUsage) if OBJ_TYPE == 'memory_info' else headingMain
-    txtCurr = update_text_current(processes,processNum,heading,unit,formatNum)  
-
     delete_old_high_process(highNum,cpuMax,highMaxTime)
     update_high_process(processes,cpuMax,highNum)
     cpuMax.sort(key=lambda x: x[1], reverse=True)
 
+        # Creating TEXT
+    heading = headingMain(memoryUsage) if OBJ_TYPE == 'memory_info' else headingMain
+    txtCurr = update_text_current(processes,processNum,heading,unit,formatNum) 
     txtHigh = update_text_high(cpuMax,headingHigh,highNum,unit,formatNum)
-
+    
+        # Updating TEXT
     currProc_label.config(text=txtCurr)
     highProc_label.config(text=txtHigh)
 
