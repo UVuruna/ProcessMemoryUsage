@@ -4,11 +4,11 @@ import datetime
 def update_text_current(processes,processNum,text):
     counter=0
     for p in processes:
-        if counter==(processNum-1):
-            t = f"{p[0]} - CPU Usage: {p[1]}%"
-            text+=t
-            return text
         if p[0]!='':
+            if counter==(processNum-1):
+                t = f"{p[0]} - CPU Usage: {p[1]}%"
+                text+=t
+                return text
             t = f"{p[0]} - CPU Usage: {p[1]}%\n"
             text+=t
             counter+=1
