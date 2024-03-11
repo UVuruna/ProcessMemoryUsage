@@ -5,13 +5,13 @@ def defineFont(familyF,sizeF,weightF='normal'):
     return font.Font(family=familyF, size=sizeF, weight=weightF)
 unitsIndex = {'KB':1024,'MB':1024**2,'GB':1024**3}
 
-processNum = int()      # rows
-highNum= int()          # rows
-unit = str()
-WIDTH = 466
+WIDTH = 463
+padding = 12
+fontWidthLength = 9.5
 highMaxTime = 3960      # sec
 refreshRate = 1333      # ms
 
+unit = str()
 red = '#FFE2E2'
 blue = '#E2F1FF'
 bgColor = '#ECF5F9'
@@ -26,11 +26,11 @@ def showOptions(root,MainScreen,unitsIndex,SecondScreen,labelFont,red,blue,textC
     highNum = int(MainScreen[2].get())
     cpuMax = [(0,0,0) for _ in range(highNum)]
     
-    window = f"{WIDTH}x{(processNum+highNum+4)*19+44}"
+    window = f"{WIDTH}x{(processNum+highNum+4)*19+3*padding}"
     root.geometry(window)
     for frame in MainScreen:
         frame.grid_forget()
-    redScreen,blueScreen = SecondScreen(root,labelFont,red,blue,textColor,33+(processNum+2)*19,processNum+2,highNum+2)
+    redScreen,blueScreen = SecondScreen(root,labelFont,red,blue,textColor,2*padding+(processNum+2)*19,processNum+2,highNum+2)
     return unit,processNum,highNum,cpuMax,formatNum,unitValue,redScreen,blueScreen
 
 def MainScreenCreate(root,labelFont,showOptionsUnit,unitsIndex,bgColor,units):
@@ -70,8 +70,8 @@ def MainScreenCreate(root,labelFont,showOptionsUnit,unitsIndex,bgColor,units):
     return lista
 
 def SecondScreen(root,labelFont,red,blue,textColor,pixY,currH,highH):
-    currProc_label = tk.Label(root, font=labelFont, text="", justify="right", background=red, width=int(WIDTH/9.7), height=currH, foreground=textColor)
-    currProc_label.place(x=12,y=12)
-    highProc_label = tk.Label(root, font=labelFont, text="", justify="right", background=blue, width=int(WIDTH/9.7), height=highH, foreground=textColor)
-    highProc_label.place(x=12,y=pixY)
+    currProc_label = tk.Label(root, font=labelFont, text="", justify="right", background=red, width=int(WIDTH/fontWidthLength), height=currH, foreground=textColor)
+    currProc_label.place(x=padding,y=padding)
+    highProc_label = tk.Label(root, font=labelFont, text="", justify="right", background=blue, width=int(WIDTH/fontWidthLength), height=highH, foreground=textColor)
+    highProc_label.place(x=padding,y=pixY)
     return currProc_label,highProc_label
