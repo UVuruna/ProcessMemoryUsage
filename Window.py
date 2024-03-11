@@ -25,7 +25,7 @@ def showOptions(root,MainScreen,unitsIndex,SecondScreen,labelFont,red,blue,textC
     highNum = int(MainScreen[2].get())
     cpuMax = [(0,0,0) for _ in range(highNum)]
     
-    window = f"418x{(processNum+highNum+4)*19+44}"
+    window = f"466x{(processNum+highNum+4)*19+44}"
     root.geometry(window)
     for frame in MainScreen:
         frame.grid_forget()
@@ -71,9 +71,9 @@ def MainScreenCreate(root,labelFont,showOptionsUnit,unitsIndex,bgColor,units):
     return lista
 
 def SecondScreen(root,labelFont,red,blue,textColor,pixY,currH,highH):
-    currProc_label = tk.Label(root, font=labelFont, text="", justify="right", background=red, width=43, height=currH, foreground=textColor)
+    currProc_label = tk.Label(root, font=labelFont, text="", justify="right", background=red, width=48, height=currH, foreground=textColor)
     currProc_label.place(x=12,y=12)
-    highProc_label = tk.Label(root, font=labelFont, text="", justify="right", background=blue, width=43, height=highH, foreground=textColor)
+    highProc_label = tk.Label(root, font=labelFont, text="", justify="right", background=blue, width=48, height=highH, foreground=textColor)
     highProc_label.place(x=12,y=pixY)
 
     return currProc_label,highProc_label
