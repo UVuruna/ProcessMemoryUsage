@@ -21,6 +21,10 @@ print('afroMan'.capitalize())
 
 
 x = [1,2,3,4]
-a,b,c,d = x
-print(a,b,c)
-print(d)
+x.insert(3,10)
+del x[-1]
+print(x)
+
+x.insert(1,20)
+del x[-1]
+print(x)

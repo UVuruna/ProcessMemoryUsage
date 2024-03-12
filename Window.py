@@ -5,20 +5,13 @@ def defineFont(familyF,sizeF,weightF='normal'):
     return font.Font(family=familyF, size=sizeF, weight=weightF)
 unitsIndex = {'KB':1024,'MB':1024**2,'GB':1024**3}
 
-WIDTH = 396
-padding = 7
-fontWidthLength = 9.4
-fontHEADWidthLength = 12
-highMaxTime = 3960      # sec
-refreshRate = 1333      # ms
-fontHeight = 19
+WIDTH = 396 ; padding = 7
+fontWidthLength = 9.4 ; fontHEADWidthLength = 12 ; fontHeight = 19
+highMaxTime = 3960 ; refreshRate = 1333
 
-red = '#FFE2E2'
-redHead = '#FFC6C6'
-blue = '#E2F1FF'
-blueHead = '#A2D2FF'
-bgColor = '#ECF5F9'
-txtColor = "#060606"
+red = '#FFE2E2' ; redHead = '#FFC6C6'
+blue = '#E2F1FF' ; blueHead = '#A2D2FF'
+bgColor = '#ECF5F9' ; txtColor = "#060606"
 
 def showOptions(root, MainScreen:list, SecondScreen:callable, unitsIndex:int, fontHEAD, FONT, red:str, blue:str, units:bool):
     unit = MainScreen[3].get() if units else '%'
@@ -35,6 +28,7 @@ def showOptions(root, MainScreen:list, SecondScreen:callable, unitsIndex:int, fo
     for frame in MainScreen:
         frame.grid_forget()
     currHead,currFrame,highHead,highFrame = SecondScreen(root,fontHEAD,FONT,red,blue,lenCurr,lenHigh)
+
     return [currHead,currFrame,lenCurr, highHead,highFrame,lenHigh, highData,unit,unitValue,decimal]
 
 def MainScreenCreate(root, START:callable, FONT, bgColor:str, unitsIndex:int, units:bool):
@@ -71,19 +65,21 @@ def MainScreenCreate(root, START:callable, FONT, bgColor:str, unitsIndex:int, un
     highestRowsTxt = tk.Label(root, bg=bgColor, font=FONT, text="Choose number of\nhighest processes: ", justify='right')
     highestRowsTxt.grid(row=2, column=0, padx=5, pady=5, sticky="e")
     MainScreen.append(highestRowsTxt)
+    
     return MainScreen
 
 def SecondScreen(root, fontHEAD, FONT, red:str, blue:str, lenCurr:int, lenHigh:int):
-    HighestHEAD_startY = int((lenCurr+2)*fontHeight+2*padding
-)
+    HighestHEAD_startY = int((lenCurr+2)*fontHeight+2*padding)
+    
     currHead = tk.Label(root, anchor='n', font=fontHEAD, text="", background=redHead, width=int(WIDTH/fontHEADWidthLength), height=2, foreground=txtColor)
     currHead.place(x=padding*2,y=padding*2)
-    currFrame = tk.Label(root, font=FONT, text="", justify="right", background=red, width=int(WIDTH/fontWidthLength), height=lenCurr, foreground=txtColor)
+    currFrame = tk.Label(root, anchor='n', font=FONT, text="", justify="right", background=red, width=int(WIDTH/fontWidthLength), height=lenCurr, foreground=txtColor)
     currFrame.place(x=padding,y=padding+2*fontHeight)
 
     highHead = tk.Label(root, anchor='n', font=fontHEAD, text="", background=blueHead, width=int(WIDTH/fontHEADWidthLength), height=2, foreground=txtColor)
     highHead.place(x=padding*2,y=HighestHEAD_startY+padding)
     highHead
-    highFrame = tk.Label(root, font=FONT, text="", justify="right", background=blue, width=int(WIDTH/fontWidthLength), height=lenHigh, foreground=txtColor)
+    highFrame = tk.Label(root, anchor='n', font=FONT, text="", justify="right", background=blue, width=int(WIDTH/fontWidthLength), height=lenHigh, foreground=txtColor)
     highFrame.place(x=padding,y=HighestHEAD_startY+2*fontHeight)
+
     return currHead,currFrame,highHead,highFrame
