@@ -5,73 +5,85 @@ def defineFont(familyF,sizeF,weightF='normal'):
     return font.Font(family=familyF, size=sizeF, weight=weightF)
 unitsIndex = {'KB':1024,'MB':1024**2,'GB':1024**3}
 
-WIDTH = 463
-padding = 12
-fontWidthLength = 9.5
+WIDTH = 396
+padding = 7
+fontWidthLength = 9.4
+fontHEADWidthLength = 12
 highMaxTime = 3960      # sec
 refreshRate = 1333      # ms
+fontHeight = 19
 
-unit = str()
 red = '#FFE2E2'
+redHead = '#FFC6C6'
 blue = '#E2F1FF'
+blueHead = '#A2D2FF'
 bgColor = '#ECF5F9'
-textColor = "#060606"
+txtColor = "#060606"
 
-def showOptions(root,MainScreen,unitsIndex,SecondScreen,labelFont,red,blue,textColor,unitsChoice=False):
-    unit = MainScreen[3].get() if unitsChoice else '%'
-    unitValue = unitsIndex[unit] if unitsChoice else 1
-    formatNum = 2 if unit=='GB' else 1 if unit=='%' else 0
+def showOptions(root, MainScreen:list, SecondScreen:callable, unitsIndex:int, fontHEAD, FONT, red:str, blue:str, units:bool):
+    unit = MainScreen[3].get() if units else '%'
+    unitValue = unitsIndex[unit] if units else 1
+    decimal = 2 if unit=='GB' else 1 if unit=='%' else 0
 
-    processNum = int(MainScreen[1].get())
-    highNum = int(MainScreen[2].get())
-    cpuMax = [(0,0,0) for _ in range(highNum)]
+    lenCurr = int(MainScreen[1].get())
+    lenHigh = int(MainScreen[2].get())
+    highData = [(0,0,0) for _ in range(lenHigh)]
+    HEIGHT = (lenCurr+lenHigh+4)*fontHeight+4*padding
     
-    window = f"{WIDTH}x{(processNum+highNum+4)*19+3*padding}"
+    window = f"{WIDTH}x{HEIGHT}"
     root.geometry(window)
     for frame in MainScreen:
         frame.grid_forget()
-    redScreen,blueScreen = SecondScreen(root,labelFont,red,blue,textColor,2*padding+(processNum+2)*19,processNum+2,highNum+2)
-    return unit,processNum,highNum,cpuMax,formatNum,unitValue,redScreen,blueScreen
+    currHead,currFrame,highHead,highFrame = SecondScreen(root,fontHEAD,FONT,red,blue,lenCurr,lenHigh)
+    return [currHead,currFrame,lenCurr, highHead,highFrame,lenHigh, highData,unit,unitValue,decimal]
 
-def MainScreenCreate(root,labelFont,showOptionsUnit,unitsIndex,bgColor,units):
-    lista = []
+def MainScreenCreate(root, START:callable, FONT, bgColor:str, unitsIndex:int, units:bool):
+    MainScreen = []
 
-    SaveButton = tk.Button(root, font=labelFont,text="Start", height=2,width=12, command=showOptionsUnit)
+    SaveButton = tk.Button(root, font=FONT,text="Start", height=2,width=12, command=START)
     SaveButton.grid(row=4,column=1, padx=5, pady=5)
-    lista.append(SaveButton)
+    MainScreen.append(SaveButton)
 
-    currentRows = ttk.Combobox(root, width=6, font=labelFont, values=[i for i in range(1,13)])
+    currentRows = ttk.Combobox(root, width=6, font=FONT, values=[i+1 for i in range(13)])
     currentRows.grid(row=1, column=1, padx=5, pady=5)
     currentRows.set(7)
-    lista.append(currentRows)
+    MainScreen.append(currentRows)
 
-    highestRows = ttk.Combobox(root, width=6, font=labelFont, values=[i for i in range(1,13)])
+    highestRows = ttk.Combobox(root, width=6, font=FONT, values=[i+1 for i in range(13)])
     highestRows.grid(row=2, column=1, padx=5, pady=5)
     highestRows.set(4)
-    lista.append(highestRows)
+    MainScreen.append(highestRows)
 
-    if units:
-        optionsUnit = ttk.Combobox(root, width=6, font=labelFont, values=list(unitsIndex.keys()))
+    if units: # Only for Memory, not for CPU
+        optionsUnit = ttk.Combobox(root, width=6, font=FONT, values=list(unitsIndex.keys()))
         optionsUnit.grid(row=0, column=1, padx=5, pady=5)
         optionsUnit.set('MB')
-        lista.append(optionsUnit)
+        MainScreen.append(optionsUnit)
 
-        optionsUnitTxt = tk.Label(root, bg=bgColor, font=labelFont, text="Choose units: ", justify='right')
+        optionsUnitTxt = tk.Label(root, bg=bgColor, font=FONT, text="Choose units: ", justify='right')
         optionsUnitTxt.grid(row=0, column=0, padx=5, pady=5, sticky="e")
-        lista.append(optionsUnitTxt)
+        MainScreen.append(optionsUnitTxt)
 
-    currentRowsTxt = tk.Label(root, bg=bgColor, font=labelFont, text="Choose number of\ncurrent processes: ", justify='right')
+    currentRowsTxt = tk.Label(root, bg=bgColor, font=FONT, text="Choose number of\ncurrent processes: ", justify='right')
     currentRowsTxt.grid(row=1, column=0, padx=5, pady=5, sticky="e")
-    lista.append(currentRowsTxt)
+    MainScreen.append(currentRowsTxt)
 
-    highestRowsTxt = tk.Label(root, bg=bgColor, font=labelFont, text="Choose number of\nhighest processes: ", justify='right')
+    highestRowsTxt = tk.Label(root, bg=bgColor, font=FONT, text="Choose number of\nhighest processes: ", justify='right')
     highestRowsTxt.grid(row=2, column=0, padx=5, pady=5, sticky="e")
-    lista.append(highestRowsTxt)
-    return lista
+    MainScreen.append(highestRowsTxt)
+    return MainScreen
 
-def SecondScreen(root,labelFont,red,blue,textColor,pixY,currH,highH):
-    currProc_label = tk.Label(root, font=labelFont, text="", justify="right", background=red, width=int(WIDTH/fontWidthLength), height=currH, foreground=textColor)
-    currProc_label.place(x=padding,y=padding)
-    highProc_label = tk.Label(root, font=labelFont, text="", justify="right", background=blue, width=int(WIDTH/fontWidthLength), height=highH, foreground=textColor)
-    highProc_label.place(x=padding,y=pixY)
-    return currProc_label,highProc_label
+def SecondScreen(root, fontHEAD, FONT, red:str, blue:str, lenCurr:int, lenHigh:int):
+    HighestHEAD_startY = int((lenCurr+2)*fontHeight+2*padding
+)
+    currHead = tk.Label(root, anchor='n', font=fontHEAD, text="", background=redHead, width=int(WIDTH/fontHEADWidthLength), height=2, foreground=txtColor)
+    currHead.place(x=padding*2,y=padding*2)
+    currFrame = tk.Label(root, font=FONT, text="", justify="right", background=red, width=int(WIDTH/fontWidthLength), height=lenCurr, foreground=txtColor)
+    currFrame.place(x=padding,y=padding+2*fontHeight)
+
+    highHead = tk.Label(root, anchor='n', font=fontHEAD, text="", background=blueHead, width=int(WIDTH/fontHEADWidthLength), height=2, foreground=txtColor)
+    highHead.place(x=padding*2,y=HighestHEAD_startY+padding)
+    highHead
+    highFrame = tk.Label(root, font=FONT, text="", justify="right", background=blue, width=int(WIDTH/fontWidthLength), height=lenHigh, foreground=txtColor)
+    highFrame.place(x=padding,y=HighestHEAD_startY+2*fontHeight)
+    return currHead,currFrame,highHead,highFrame

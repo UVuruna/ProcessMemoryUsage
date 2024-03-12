@@ -3,86 +3,100 @@ import datetime
 import psutil
 from collections import defaultdict
 
-def UpdateProcess(processNum,headingMain,formatNum,highNum,cpuMax,highMaxTime,headingHigh,currProc_label,highProc_label,OBJ_TYPE,unit,unitValue):
+# DATA Functions
+def UpdateProcess(RESOURCE:str, currentFrame, lenCurr:int, highestFrame, lenHigh:int, highData:list, highMaxTime:int, decimal:int, unit:str, unitValue:int, headTxt=None, heading=None):
     processesRaw = defaultdict(int)
     memoryUsage = 0
 
     # Creating/Updating DATA
-    if OBJ_TYPE == 'memory_info':
-        for p in psutil.process_iter(['name', OBJ_TYPE]):
-            mem = p.info[OBJ_TYPE].rss/unitValue
-            processesRaw[p.info['name']] +=mem
+    if RESOURCE == 'memory_info':
+        for p in psutil.process_iter(['name', RESOURCE]):
+            name = p.info['name'][:-4] if p.info['name'][-4:].lower() == '.exe' else p.info['name']
+            mem = p.info[RESOURCE].rss/unitValue
+            processesRaw[name] +=mem
             memoryUsage +=mem
-    elif OBJ_TYPE == 'cpu_percent':
-        for p in psutil.process_iter(['name', OBJ_TYPE]):
-            processesRaw[p.info['name']] += p.info[OBJ_TYPE]
+        heading.config(text=headTxt(memoryUsage))
+    elif RESOURCE == 'cpu_percent':
+        for p in psutil.process_iter(['name', RESOURCE]):
+            name = p.info['name'][:-4] if p.info['name'][-4:].lower() == '.exe' else p.info['name']
+            processesRaw[name] += p.info[RESOURCE]
     processes = sorted(processesRaw.items(), key=lambda x: x[1], reverse=True)
-    delete_old_high_process(highNum,cpuMax,highMaxTime)
-    update_high_process(processes,cpuMax,highNum)
-    cpuMax.sort(key=lambda x: x[1], reverse=True)
+    delete_old_high_process(highData,lenHigh,highMaxTime)
+    update_high_process(processes,highData,lenHigh)
+    highData.sort(key=lambda x: x[1], reverse=True)
 
         # Creating TEXT
-    heading = headingMain(memoryUsage) if OBJ_TYPE == 'memory_info' else headingMain
-    txtCurr = update_text_current(processes,processNum,heading,unit,formatNum) 
-    txtHigh = update_text_high(cpuMax,headingHigh,highNum,unit,formatNum)
+    txtCurr = update_text_current(processes,lenCurr,unit,decimal) 
+    txtHigh = update_text_high(highData,lenHigh,unit,decimal)
     
         # Updating TEXT
-    currProc_label.config(text=txtCurr)
-    highProc_label.config(text=txtHigh)
+    currentFrame.config(text=txtCurr)
+    highestFrame.config(text=txtHigh)
 
-def update_text_current(processes,processNum,text,unit,formatNum):
+def delete_old_high_process(highData:list, lenHigh:int, highMaxTime:int):
+    now = time.time()    
+    for i in range(lenHigh):
+        if now-highData[i][2]>=highMaxTime:
+            del highData[i] # Brise clan koji dugo stoji po indeksu (preko x minuta)
+            highData.append((0,0,0)) # Dodaje prazan clan na kraj
+
+def update_high_process(processes:list, highData:list, lenHigh:int):
+    pos=0 # Pomera se ka kraju liste (ne proverava stalno odradjene segmente)
+    for p in processes:
+        if p[1] <= highData[-1][1]: # Prekida prevremeno ako je trenutni najveci clan manji od poslednjeg iz liste
+            return
+        for pozicija in range(pos,lenHigh):
+            if p[0] not in ['System Idle Process',''] and p[1]>highData[pozicija][1]:
+                if pozicija==0:
+                    highData.insert(pozicija,(p[0],p[1],time.time())) # Ubacuje na konkretnu poziciju
+                    del highData[-1] # Brise po indeksu (Brise POSELEDNJI clan)
+                    pos += 1 # U sustini pos postaje 1+POZICIJA ako se dodaje clan. Ali posto je pozicija 0 : pos+=1
+                    checkAfter(highData,p,pozicija)
+                    break
+                else:
+                    pos = checkBefore(highData,p,pozicija,lenHigh)
+                    break
+
+def checkBefore(highData:list, proces:tuple, currentPos:int, lenHigh:int): # Desava se uvek nakon ubacivanja (osim ako se ubaciju na POCETAK liste)
+    for posBefore in range(currentPos):
+        if highData[posBefore][0] == proces[0]: # Proverava da li ima clan sa istim imenom pre (onda ne ubacuje)
+            return currentPos
+    else:
+        highData.insert(currentPos,(proces[0],proces[1],time.time())) # Ubacuje na konkretnu poziciju
+        del highData[-1] # Brise po indeksu (Brise POSELEDNJI clan)
+        if currentPos!=(lenHigh-1):
+            checkAfter(highData,proces,currentPos)
+        return currentPos+1
+        
+def checkAfter(highData:list, proces:tuple, currentPos:int): # Desava se uvek nakon ubacivanja (osim ako se ubacuje na KRAJ liste)
+    for posAfter in highData[currentPos+1:]:
+        if posAfter[0] == proces[0]: # Proverava da li ima clan sa istim imenom posle (onda ga brise)
+            highData.remove(posAfter) # Brise po sadrzaju
+            highData.append((0,0,0)) # Ubacuje na kraj
+
+# OUTPUT Text Functions
+def update_text_current(processes:list, lenCurr:int, unit:str, decimal:int):
     counter=0
+    text=str()
+    obj = 'CPU' if unit=='%' else 'RAM'
     for p in processes:
         if p[0]!='':
-            if counter==(processNum-1):
-                t = "{} - CPU Usage: {:,.{}f} {}".format(p[0], p[1], formatNum, unit)
+            if counter==(lenCurr-1):
+                t = "{} - {}: {:,.{}f} {}".format(p[0], obj, p[1], decimal, unit)
                 text+=t
                 return text
-            t = "{} - CPU Usage: {:,.{}f} {}\n".format(p[0], p[1], formatNum, unit)
+            t = "{} - {}: {:,.{}f} {}\n".format(p[0], obj, p[1], decimal, unit)
             text+=t
             counter+=1
 
-def update_text_high(cpuMax,text,highNum,unit,formatNum):
-    for i in range(highNum):
-        name = cpuMax[i][0]
-        timeOccurance = datetime.datetime.fromtimestamp(cpuMax[i][2]).strftime('%H:%M')
-        usage = cpuMax[i][1]
-        end = '' if i == (highNum-1) else '\n'
-        t = "{} : {}  -  Memory: {:,.{}f} {}".format(name,timeOccurance,usage,formatNum,unit)+end
+def update_text_high(highData:list, lenHigh:int, unit:str, decimal:int):
+    text=str()
+    obj = 'CPU' if unit=='%' else 'RAM'
+    for i in range(lenHigh):
+        processName = highData[i][0]
+        timeOccurance = datetime.datetime.fromtimestamp(highData[i][2]).strftime('%H:%M')
+        processUsage = highData[i][1]
+        end = '' if i == (lenHigh-1) else '\n' # Dodavlja novi red svuda osim na kraj
+        t = "{} : {}  -  {}: {:,.{}f} {}".format(processName,timeOccurance,obj,processUsage,decimal,unit)+end
         text+=t
     return text
-
-def delete_old_high_process(lenCpuMax,cpuMax,highMaxTime):
-    now = time.time()    
-    for i in range(lenCpuMax):
-        if now-cpuMax[i][2]>=highMaxTime:
-            cpuMax[i] = (0,0,0)
-
-def update_high_process(processes,lista,lenCpuMax):
-    for p in processes:
-        if p[1]<lista[-1][1]:
-            return
-        for pozicija in range(lenCpuMax):
-            if p[0] not in ['System Idle Process',''] and p[1]>lista[pozicija][1]:
-                if pozicija==0:
-                    lista[pozicija] = (p[0],p[1],time.time())
-                    checkAfter(lista,p,pozicija)
-                    break
-                else:
-                    checkBefore(lista,p,pozicija,lenCpuMax)
-                    break
-
-def checkBefore(lista,proces,currentPos,lenCpuMax):
-    for posBefore in range(currentPos):
-        if lista[posBefore][0] == proces[0]:
-            return
-    else:
-        lista[currentPos] = (proces[0],proces[1],time.time())
-        if currentPos!=(lenCpuMax-1):
-            checkAfter(lista,proces,currentPos)
-        return
-        
-def checkAfter(lista,proces,currentPos):
-    for posAfter in lista[currentPos+1:]:
-        if posAfter[0] == proces[0]:
-            lista[lista.index(posAfter)] = (0,0,0)

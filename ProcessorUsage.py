@@ -2,26 +2,35 @@ import tkinter as tk
 from CalculatingFunctions import *
 from Window import *
 
-RESOURCE = 'cpu_percent'
 
 root = tk.Tk()
 root.configure(bg=bgColor)
 root.title("Top CPU Processes")
 
-headingMain = 'Current CPU usage %:\t\n\n'
-headingHigh = f'Highest CPU usage % (last {int(highMaxTime/60)} min):\t\n\n'
-labelFont = defineFont('Arial',13)
+UNITS = False
+RESOURCE = 'cpu_percent'
+fontHEAD = defineFont('Arial',14)
+FONT = defineFont('Arial',13)
 
-def showOptionsUnit():
-    global unit,processNum,highNum,cpuMax,formatNum,unitValue,redScreen,blueScreen
-    
-    unit,processNum,highNum,cpuMax,formatNum,unitValue,redScreen,blueScreen = showOptions(root,MainScreen,unitsIndex,SecondScreen,labelFont,red,blue,textColor,False)
+def heading_Main():
+    return 'Current CPU usage %:'
+def heading_High():
+    return f'Highest CPU usage % (last {int(highMaxTime/60)} min):'
+
+def START():
+    global currHead,currFrame,lenCurr,highHead,highFrame,lenHigh,highData,unit,unitValue,decimal
+
+    showOptionsRETURN = showOptions(root,MainScreen,SecondScreen,unitsIndex,fontHEAD,FONT,red,blue,UNITS)
+    currHead,currFrame,lenCurr,highHead,highFrame,lenHigh,highData,unit,unitValue,decimal = showOptionsRETURN
+    highHead.config(text=heading_High())
+    currHead.config(text=heading_Main())
+
     update_process()
 
 def update_process():
-    UpdateProcess(processNum,headingMain,formatNum,highNum,cpuMax,highMaxTime,headingHigh,redScreen,blueScreen,RESOURCE,unit,unitValue)
+    UpdateProcess(RESOURCE,currFrame,lenCurr,highFrame,lenHigh,highData,highMaxTime,decimal,unit,unitValue)
     root.after(refreshRate, update_process)
 
-MainScreen = MainScreenCreate(root,labelFont,showOptionsUnit,unitsIndex,bgColor,units=False)
+MainScreen = MainScreenCreate(root,START, FONT,bgColor, unitsIndex,UNITS)
 
 root.mainloop()
