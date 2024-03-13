@@ -21,6 +21,7 @@ def START():
     PC,refreshRate,removeRate,currHead,currFrame,lenCurr,highHead,highFrame,lenHigh,highData,unit,unitValue,decimal = GetSettingRETURN
     highHead.config(text=heading_High(removeRate))
     cpu = PC*100
+    
     update_process()
 
 def update_process():
