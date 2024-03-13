@@ -3,12 +3,14 @@ from datetime import datetime,timedelta
 import psutil
 from collections import defaultdict
 
+maxUsage = (0,0)
 # DATA Functions
-def UpdateProcess(RESOURCE:str, currentFrame, lenCurr:int, highestFrame, lenHigh:int, highData:list, removeRate:int, decimal:int, unit:str, unitValue:int, headTxt=None, heading=None, PC=None):
+def UpdateProcess(RESOURCE:str, currentFrame, lenCurr:int, highestFrame, lenHigh:int, highData:list, removeRate:int, decimal:int, unit:str, unitValue:int, headTxt:callable, headFrame, PC=None):
+    global maxUsage
     processesRaw = defaultdict(int)
-    memoryUsage = 0
         # Creating/Updating DATA
     if RESOURCE == 'memory_info':
+        memoryUsage = 0
         for p in psutil.process_iter(['name', RESOURCE]):
             name = p.info['name'][:-4] if p.info['name'][-4:].lower() == '.exe' else p.info['name']
             mem = p.info[RESOURCE].rss/unitValue
@@ -17,20 +19,20 @@ def UpdateProcess(RESOURCE:str, currentFrame, lenCurr:int, highestFrame, lenHigh
                 name = 'Visual Studio Code' if name[:4]=='Code' else 'Logi Options+' if name[:4]=='logi' else 'Steam' if name[:5]=='steam' \
                         else 'NVIDIA' if name[:2].lower()=='nv' else 'Microsoft Edge' if name[:6]=='msedge' else name
                 processesRaw[name] +=mem
-        heading.config(text=headTxt(memoryUsage))
+        maxUsage = (memoryUsage,datetime.now()) if maxUsage[0]<memoryUsage else maxUsage
+        headFrame.config(text=headTxt(memoryUsage))
 
     elif RESOURCE == 'cpu_percent':
-        suma =0
         for p in psutil.process_iter(['name', RESOURCE]):
-            suma+=p.info[RESOURCE]
             name = p.info['name'][:-4] if p.info['name'][-4:].lower() == '.exe' else p.info['name']
             if name:
                 if name == 'System Idle Process':
-                    total = PC-p.info[RESOURCE]
+                    cpuUsage = PC-p.info[RESOURCE]
                 name = 'Visual Studio Code' if name[:4]=='Code' else 'Logi Options+' if name[:4]=='logi' else 'Steam' if name[:5]=='steam' \
                         else 'NVIDIA' if name[:2].lower()=='nv' else 'Microsoft Edge' if name[:6]=='msedge' else name
                 processesRaw[name] += p.info[RESOURCE]
-        heading.config(text=headTxt(total))
+        maxUsage = (cpuUsage,datetime.now()) if maxUsage[0]<cpuUsage else maxUsage
+        headFrame.config(text=headTxt(cpuUsage))
 
     processes = sorted(processesRaw.items(), key=lambda x: x[1], reverse=True)
     delete_old_high_process(highData,lenHigh,removeRate)
@@ -90,10 +92,8 @@ def checkAfter(highData:list, proces:tuple, currentPos:int): # Desava se uvek na
             return True
 
 # OUTPUT Text Functions
-def heading_High(removeRate):
-    new_time = datetime.now() - timedelta(minutes=removeRate)
-    result = new_time.strftime("%H:%M")
-    return f'Highest usage from {result}'        
+def heading_High(unit,decimal):
+    return 'Highest usage {:,.{}f} {}: {}'.format(maxUsage[0],decimal,unit,maxUsage[1].strftime("%H:%M"))       
 
 def update_text_current(processes:list, lenCurr:int, unit:str, decimal:int):
     text=str()

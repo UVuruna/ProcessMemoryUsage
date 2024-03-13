@@ -16,16 +16,16 @@ def heading_Main(memoryUsage):
 
 def START():
     global memory,refreshRate,removeRate,currHead,currFrame,lenCurr,highHead,highFrame,lenHigh,highData,unit,unitValue,decimal
-    
     GetSettingRETURN = GetSetting(root,SettingScreen,MainScreen,unitsIndex,fontHEAD,FONT,red,blue,UNITS)
     PC,refreshRate,removeRate,currHead,currFrame,lenCurr,highHead,highFrame,lenHigh,highData,unit,unitValue,decimal = GetSettingRETURN
-    highHead.config(text=heading_High(removeRate))
     memory = PC*(1024**3/unitsIndex[unit])
     
     update_process()
 
 def update_process():
     UpdateProcess(RESOURCE,currFrame,lenCurr,highFrame,lenHigh,highData,removeRate,decimal,unit,unitValue,heading_Main,currHead)
+    highHead.config(text=heading_High(unit,decimal))
+    
     root.after(refreshRate, update_process)
 
 SettingScreen = SettingScreenCreate(root,START, FONT,bgColor, unitsIndex,UNITS)
