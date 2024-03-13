@@ -4,10 +4,12 @@ from tkinter import ttk,font
 def defineFont(familyF,sizeF,weightF='normal'):
     return font.Font(family=familyF, size=sizeF, weight=weightF)
 unitsIndex = {'KB':1024,'MB':1024**2,'GB':1024**3}
-
-WIDTH = 396 ; margin = 7
 fontWidthLength = 9.4 ; fontHEADWidthLength = 12 ; fontHeight = 19
-defaultRefresh = 2000 ; defaultRemove = 120
+
+WIDTH = 396
+margin = 7
+defaultRefresh = 2000
+defaultRemove = 120
 
 red = '#FFE2E2' ; redHead = '#FFC6C6'
 blue = '#E2F1FF' ; blueHead = '#A2D2FF'
@@ -132,7 +134,6 @@ def SettingScreenCreate(root, START:callable, FONT, bgColor:str, unitsIndex:int,
         totalCores.set(16)
         SettingScreen.append(totalCores)
 
-    
     return SettingScreen
 
 def MainScreen(root, fontHEAD, FONT, red:str, blue:str, lenCurr:int, lenHigh:int):

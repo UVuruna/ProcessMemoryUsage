@@ -36,9 +36,11 @@ def UpdateProcess(RESOURCE:str, currentFrame, lenCurr:int, highestFrame, lenHigh
     delete_old_high_process(highData,lenHigh,removeRate)
     update_high_process(processes,highData,lenHigh)
     highData.sort(key=lambda x: x[1], reverse=True)
+
         # Creating TEXT
     txtCurr = update_text_current(processes,lenCurr,unit,decimal) 
     txtHigh = update_text_high(highData,lenHigh,unit,decimal)
+
         # Updating TEXT
     currentFrame.config(text=txtCurr)
     highestFrame.config(text=txtHigh)
@@ -89,8 +91,7 @@ def checkAfter(highData:list, proces:tuple, currentPos:int): # Desava se uvek na
 
 # OUTPUT Text Functions
 def heading_High(removeRate):
-    now = datetime.now()
-    new_time = now - timedelta(minutes=removeRate)
+    new_time = datetime.now() - timedelta(minutes=removeRate)
     result = new_time.strftime("%H:%M")
     return f'Highest usage from {result}'        
 
