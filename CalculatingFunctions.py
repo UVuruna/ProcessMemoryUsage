@@ -1,10 +1,10 @@
 import time 
-import datetime
+from datetime import datetime,timedelta
 import psutil
 from collections import defaultdict
 
 # DATA Functions
-def UpdateProcess(RESOURCE:str, currentFrame, lenCurr:int, highestFrame, lenHigh:int, highData:list, highMaxTime:int, decimal:int, unit:str, unitValue:int, headTxt=None, heading=None):
+def UpdateProcess(RESOURCE:str, currentFrame, lenCurr:int, highestFrame, lenHigh:int, highData:list, removeRate:int, decimal:int, unit:str, unitValue:int, headTxt=None, heading=None, PC=None):
     processesRaw = defaultdict(int)
     memoryUsage = 0
         # Creating/Updating DATA
@@ -12,19 +12,28 @@ def UpdateProcess(RESOURCE:str, currentFrame, lenCurr:int, highestFrame, lenHigh
         for p in psutil.process_iter(['name', RESOURCE]):
             name = p.info['name'][:-4] if p.info['name'][-4:].lower() == '.exe' else p.info['name']
             mem = p.info[RESOURCE].rss/unitValue
+            memoryUsage +=mem
             if name:
+                name = 'Visual Studio Code' if name[:4]=='Code' else 'Logi Options+' if name[:4]=='logi' else 'Steam' if name[:5]=='steam' \
+                        else 'NVIDIA' if name[:2].lower()=='nv' else 'Microsoft Edge' if name[:6]=='msedge' else name
                 processesRaw[name] +=mem
-                memoryUsage +=mem
         heading.config(text=headTxt(memoryUsage))
 
     elif RESOURCE == 'cpu_percent':
+        suma =0
         for p in psutil.process_iter(['name', RESOURCE]):
+            suma+=p.info[RESOURCE]
             name = p.info['name'][:-4] if p.info['name'][-4:].lower() == '.exe' else p.info['name']
             if name:
+                if name == 'System Idle Process':
+                    total = PC-p.info[RESOURCE]
+                name = 'Visual Studio Code' if name[:4]=='Code' else 'Logi Options+' if name[:4]=='logi' else 'Steam' if name[:5]=='steam' \
+                        else 'NVIDIA' if name[:2].lower()=='nv' else 'Microsoft Edge' if name[:6]=='msedge' else name
                 processesRaw[name] += p.info[RESOURCE]
+        heading.config(text=headTxt(total))
 
     processes = sorted(processesRaw.items(), key=lambda x: x[1], reverse=True)
-    delete_old_high_process(highData,lenHigh,highMaxTime)
+    delete_old_high_process(highData,lenHigh,removeRate)
     update_high_process(processes,highData,lenHigh)
     highData.sort(key=lambda x: x[1], reverse=True)
         # Creating TEXT
@@ -34,10 +43,10 @@ def UpdateProcess(RESOURCE:str, currentFrame, lenCurr:int, highestFrame, lenHigh
     currentFrame.config(text=txtCurr)
     highestFrame.config(text=txtHigh)
 
-def delete_old_high_process(highData:list, lenHigh:int, highMaxTime:int):
+def delete_old_high_process(highData:list, lenHigh:int, removeRate:int):
     now = time.time()    
     for i in range(lenHigh):
-        if now-highData[i][2]>=highMaxTime:
+        if now-highData[i][2]>=(removeRate*60):
             del highData[i] # Brise clan koji dugo stoji po indeksu (preko x minuta)
             highData.append((0,0,0)) # Dodaje prazan clan na kraj
 
@@ -79,12 +88,21 @@ def checkAfter(highData:list, proces:tuple, currentPos:int): # Desava se uvek na
             return True
 
 # OUTPUT Text Functions
+def heading_High(removeRate):
+    now = datetime.now()
+    new_time = now - timedelta(minutes=removeRate)
+    result = new_time.strftime("%H:%M")
+    return f'Highest usage from {result}'        
+
 def update_text_current(processes:list, lenCurr:int, unit:str, decimal:int):
     text=str()
     obj = 'CPU' if unit=='%' else 'RAM'
     for p in range(lenCurr):
         end = '' if p==(lenCurr-1) else '\n'
-        text += "{} - {}: {:,.{}f} {}".format(processes[p][0], obj, processes[p][1], decimal, unit)+end
+        try:
+            text += "{} - {}: {:,.{}f} {}".format(processes[p][0], obj, processes[p][1], decimal, unit)+end
+        except IndexError:
+            return text
     return text
 
 def update_text_high(highData:list, lenHigh:int, unit:str, decimal:int):
@@ -93,7 +111,7 @@ def update_text_high(highData:list, lenHigh:int, unit:str, decimal:int):
     for i in range(lenHigh):
         if not highData[i][0]:
             break
-        timeOccurance = datetime.datetime.fromtimestamp(highData[i][2]).strftime('%H:%M')
+        timeOccurance = datetime.fromtimestamp(highData[i][2]).strftime('%H:%M')
         end = '' if i == (lenHigh-1) else '\n' # Dodavlja novi red svuda osim na kraj
         text += "{} : {}  -  {}: {:,.{}f} {}".format(highData[i][0],timeOccurance,obj,highData[i][1],decimal,unit)+end
     return text

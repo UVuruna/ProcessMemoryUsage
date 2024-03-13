@@ -2,7 +2,6 @@ import tkinter as tk
 from CalculatingFunctions import *
 from Window import *
 
-
 root = tk.Tk()
 root.configure(bg=bgColor)
 root.title("Top CPU Processes")
@@ -12,25 +11,22 @@ RESOURCE = 'cpu_percent'
 fontHEAD = defineFont('Arial',14)
 FONT = defineFont('Arial',13)
 
-def heading_Main():
-    return 'Current CPU usage %:'
-def heading_High():
-    return f'Highest CPU usage % (last {int(highMaxTime/60)} min):'
+def heading_Main(percent):
+    return f'Current usage {percent:,.1f}% / {cpu}%'
 
 def START():
-    global currHead,currFrame,lenCurr,highHead,highFrame,lenHigh,highData,unit,unitValue,decimal
+    global cpu,refreshRate,removeRate,currHead,currFrame,lenCurr,highHead,highFrame,lenHigh,highData,unit,unitValue,decimal
 
-    showOptionsRETURN = showOptions(root,MainScreen,SecondScreen,unitsIndex,fontHEAD,FONT,red,blue,UNITS)
-    currHead,currFrame,lenCurr,highHead,highFrame,lenHigh,highData,unit,unitValue,decimal = showOptionsRETURN
-    highHead.config(text=heading_High())
-    currHead.config(text=heading_Main())
-
+    GetSettingRETURN = GetSetting(root,SettingScreen,MainScreen,unitsIndex,fontHEAD,FONT,red,blue,UNITS)
+    PC,refreshRate,removeRate,currHead,currFrame,lenCurr,highHead,highFrame,lenHigh,highData,unit,unitValue,decimal = GetSettingRETURN
+    highHead.config(text=heading_High(removeRate))
+    cpu = PC*100
     update_process()
 
 def update_process():
-    UpdateProcess(RESOURCE,currFrame,lenCurr,highFrame,lenHigh,highData,highMaxTime,decimal,unit,unitValue)
+    UpdateProcess(RESOURCE,currFrame,lenCurr,highFrame,lenHigh,highData,removeRate,decimal,unit,unitValue,heading_Main,currHead,cpu)
     root.after(refreshRate, update_process)
 
-MainScreen = MainScreenCreate(root,START, FONT,bgColor, unitsIndex,UNITS)
+SettingScreen = SettingScreenCreate(root,START, FONT,bgColor, unitsIndex,UNITS)
 
 root.mainloop()
