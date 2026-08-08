@@ -17,7 +17,7 @@ Themes are per **scope**, never per app (owner 2026-07-26): each monitor
 window owns its own `ThemeScope`, so the Day/Night switch in the CPU header
 flips the CPU window alone. There is deliberately no global `theme()`
 accessor — a widget may only ask "what is MY scope's theme?". Colors are
-also computed, not enumerated (root Rule #19): one authored set of hues is
+also computed, not enumerated (Compute, Don't Generate — rules/CODE.md): one authored set of hues is
 re-shaded per theme by `shade_for_theme()` rather than hand-authoring a
 second light-mode table.
 
@@ -79,9 +79,9 @@ or `window_theme(key)`, never constructed directly.
   therefore always read as `scope.palette` inside a restyle method.
 - **Scopes over a single global theme.** A global `theme()` accessor would
   make per-window themes inexpressible — any widget could reach the one
-  active palette. It was removed outright (root Rule #6, no compatibility
-  shim): every color call site was revisited and given the scope it belongs
-  to.
+  active palette. It was removed outright (No Backward Compatibility —
+  rules/CODE.md — no compatibility shim): every color call site was
+  revisited and given the scope it belongs to.
 - **The palette carries data tokens.** `COMPANY_TOP`, `COMPANY_UNKNOWN`,
   `HUE_*` and `VALUE_LIGHTNESS` are process-coloring inputs, but they must
   flip with the theme, so they live with the palette, not in

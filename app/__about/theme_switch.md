@@ -6,7 +6,7 @@
 
 The Day/Night theme toggle shown in each window header and on the setup
 screen — an image pill ported from the owner's website switch, the same
-control PromptPainter uses (root Rule #5 — reuse, never re-author). OFF/left
+control PromptPainter uses (No Duplicate Code — rules/CODE.md — reuse, never re-author). OFF/left
 is the MOON on a dark starfield track; ON/right is the SUN on a
 sky-and-clouds track. A click flips the theme synchronously, then the knob
 slides as an eased flourish.

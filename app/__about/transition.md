@@ -15,9 +15,11 @@ The mechanism grabs the affected window(s) into a borderless, always-on-top
 cover, composites the NEXT theme's sun or moon in the middle, forces the
 cover painted, flips the theme hidden behind it, lets the restyle cascade
 settle, then fades the cover out. It is the shape PromptPainter already uses
-for the same problem (root Rule #5 — reuse, never re-author), ported to Qt.
+for the same problem (No Duplicate Code — rules/CODE.md — reuse, never
+re-author), ported to Qt.
 The cover is a pure visual nicety: any failure to build one is reported and
-the flip still happens instantly (root Rule #1's documented-fallback case).
+the flip still happens instantly (No Error Masking's, rules/CODE.md,
+documented-fallback case).
 
 ## Connections
 

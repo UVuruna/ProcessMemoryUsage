@@ -105,4 +105,4 @@ widgets, the status banner, layout persistence, the process menu — leaving
 only the QMainWindow subclass's own construction and lifecycle code. Splitting
 further would mean breaking one cohesive class into mixins, which fragments a
 single responsibility across files instead of separating two different ones —
-exactly the outcome Rule #20 warns against.
+exactly the outcome THE CONFIG SECTION LAW (rules/CODE.md) warns against.

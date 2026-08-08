@@ -7,7 +7,7 @@
 The one surface allowed to shout. `StatusBanner` is hidden until something is
 actually wrong, and sits between the header and the data because a failure
 that only whispers from a corner label reads as "no traffic", not "broken"
-(root Rule #1) — the owner reported the Network window as "showing nothing"
+(No Error Masking — rules/CODE.md) — the owner reported the Network window as "showing nothing"
 when it was in fact refusing to trace and saying so in 10pt muted grey.
 
 It shows a `TraceFailure`'s two lines (`reason`, `action`) and ONE remedy

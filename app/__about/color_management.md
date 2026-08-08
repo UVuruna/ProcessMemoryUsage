@@ -71,7 +71,7 @@ Thread-safe singleton (`QMutex`-guarded `__new__`), reached as
 - **One authored hue set serves both themes.** `config/config.json`'s value
   colors are hues only; each theme re-shades them via `shade_for_theme()`
   rather than the config carrying a second, hand-maintained light-mode table
-  (root Rule #19).
+  (Compute, Don't Generate — rules/CODE.md).
 - **Temperature colors are not in this module.** `config/config.json`'s
   `temp_colors` section carries only `warning_threshold` / `critical_threshold`;
   the colors themselves come from the palette (`TEMP_WARNING`/`TEMP_CRITICAL`)

@@ -4,8 +4,8 @@
 
 ## The config section tree
 
-`styles.py` is organized under named banner comments — root Rule #20's
-"defined once, whole, in its section". Every non-color tunable value lives
+`styles.py` is organized under named banner comments — THE CONFIG SECTION LAW's
+(rules/CODE.md) "defined once, whole, in its section". Every non-color tunable value lives
 under exactly one of these:
 
 ```
@@ -64,5 +64,5 @@ FUNCTION get_process_display_name(name):
 ```
 
 A value is added to exactly one section, defined once and whole — never
-patched onto a class after its definition (root Rule #20's "defined once,
-whole, in its section").
+patched onto a class after its definition (THE CONFIG SECTION LAW's,
+rules/CODE.md, "defined once, whole, in its section").

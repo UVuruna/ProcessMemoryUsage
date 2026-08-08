@@ -149,7 +149,7 @@ detail this diagram omits.
   formatters) lives in [Styles](__about/styles.md), plus `config/config.json`
   for value-color hues and temperature trip points. The question "should
   this be hardcoded?" always resolves to "is it a color?" first.
-- **Colors are computed, never enumerated (root Rule #19).** There is no
+- **Colors are computed, never enumerated (Compute, Don't Generate — rules/CODE.md).** There is no
   second, hand-authored light-mode color table anywhere in the app. One
   authored hue set is re-shaded per theme by `shade_for_theme()`
   ([Theme](__about/theme.md)), and the process-coloring wheel is generated

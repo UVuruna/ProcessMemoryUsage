@@ -62,7 +62,8 @@ flowchart LR
   key.** `installer.nsi`'s `SecAutostart` section creates a scheduled task
   because Windows silently skips a Registry `Run` entry for an elevated app
   — the registry route would look like it worked and simply never fire.
-- **`sign_file()` is the ONE reusable signer** (root Rule #5), applied to
+- **`sign_file()` is the ONE reusable signer** (No Duplicate Code —
+  rules/CODE.md), applied to
   BOTH the inner exe (step 3) and the final installer (step 5). Signing only
   the inner exe would ship an unsigned installer — the file the user
   actually downloads and runs — which defeats the SmartScreen mitigation

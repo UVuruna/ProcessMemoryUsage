@@ -7,7 +7,8 @@
 
 Config home for every tunable value that is **not** a color: dimensions,
 switch geometry, transition timing, fonts, default settings, unit tables,
-process-name aliases, and the shared QSS/formatter functions (root Rule #4).
+process-name aliases, and the shared QSS/formatter functions (No Duplicate
+Code — rules/CODE.md).
 Colors are deliberately absent — they must flip at runtime between the dark
 and light palettes and each window may be on a different one, so they live
 in [Theme](theme.md) and are always passed in as a `Palette` at restyle

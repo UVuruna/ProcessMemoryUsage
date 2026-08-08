@@ -7,7 +7,7 @@
 Renders every SVG in `assets/icons/` and tints it for the caller's theme.
 Each icon is ONE master file; size and color variants are computed on
 demand and cached, never shipped as separate per-theme/per-size assets
-(root Rule #19). Two kinds of art live here: GLYPHS (`pause`, `play`,
+(Compute, Don't Generate — rules/CODE.md). Two kinds of art live here: GLYPHS (`pause`, `play`,
 `settings`) authored as solid white shapes and re-tinted at render time to
 follow a scope's `ICON` token, and full-color ART (the Day/Night switch
 track and its sun/moon knobs) rendered as-is, shared with the owner's
